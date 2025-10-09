@@ -17,6 +17,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Alert, AlertTitle } from "@/components/ui/alert"
 import { OctagonAlertIcon } from "lucide-react"
+import { FaGithub, FaGoogle } from "react-icons/fa"
 import Link from "next/link"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
@@ -58,10 +59,29 @@ const SignUpView = () => {
       name: data.name,
       email: data.email,
       password: data.password,
+      callbackURL: "/"
     }, {
       onSuccess: () => {
         setLoading(false)
         router.push("/")
+      },
+      onError: ({ error }) => {
+        setLoading(false)
+        setError(error.message)
+      }
+    })
+  }
+
+  const onSocial = (provider: "github" | "google") => {
+    setError(null)
+    setLoading(true)
+
+    authClient.signIn.social({
+      provider: provider,
+      callbackURL: "/"
+    }, {
+      onSuccess: () => {
+        setLoading(false)
       },
       onError: ({ error }) => {
         setLoading(false)
@@ -164,16 +184,18 @@ const SignUpView = () => {
                     variant="outline"
                     className="w-full"
                     disabled={loading}
+                    onClick={() => onSocial("google")}
                   >
-                    Google
+                    <FaGoogle />
                   </Button>
                   <Button 
                     type="button"
                     variant="outline"
                     className="w-full"
                     disabled={loading}
+                    onClick={() => onSocial("github")}
                   >
-                    Github
+                    <FaGithub />
                   </Button>
                 </div>
                 <div className="text-center text-sm">
