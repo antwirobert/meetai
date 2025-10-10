@@ -1,4 +1,3 @@
-
 import { auth } from "@/lib/auth"
 import HomeView from "@/modules/home/ui/views/home-view"
 import { headers } from "next/headers"
