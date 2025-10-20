@@ -27,9 +27,31 @@ export const meetingsRouter = createTRPCRouter({
         search: z.string().nullish()
     })).query(async ({ ctx, input }) => {
         const { search, page, pageSize } = input
-        
-        throw new TRPCError({ code: "NOT_FOUND", message: "Meeting not found" })
+        const data = await db.select({ ...getTableColumns(meetings) })
+        .from(meetings)
+        .where(and(
+            eq(meetings.userId, ctx.auth.user.id),
+            search ? ilike(meetings.name, `%${search}%`) : undefined
+        ))
+        .orderBy(desc(meetings.createdAt), desc(meetings.id))
+        .limit(pageSize)
+        .offset((page - 1) * pageSize)
 
+        const [total] = await db
+        .select({ count: count() })
+        .from(meetings)
+        .where(and(
+            eq(meetings.userId, ctx.auth.user.id),
+            search ? ilike(meetings.name, `%${search}%`) : undefined
+        ))
+
+        const totalPages = Math.ceil(total.count / pageSize)
+
+        return {
+            items: data,
+            total: total.count,
+            totalPages
+        }
     })
 })
 
