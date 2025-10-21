@@ -21,9 +21,7 @@ export const agentsRouter = createTRPCRouter({
         }
 
         return updatedAgent
-    })
-    ,
-    
+    }),
     remove: protectedProcedure.input(z.object({ id: z.string() }))
     .mutation(async ({ input, ctx  }) => {
         const [removedAgent] = await db.delete(agents).where(and(
